@@ -9,11 +9,11 @@ import {
 } from "@/components/ui/sheet";
 import { LogOut, Menu, Search } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
-import { useAuth0 } from "@/components/app-components/MockAuthProvider";
 import CreateNoteDialog from "@/components/app-components/CreateNoteDialog";
 import FirstInteraction from "@/components/app-components/FirstInteraction";
 import NoteCard from "@/components/app-components/NoteCard";
 import { Input } from "@/components/ui/input";
+import { useAuth0 } from "@auth0/auth0-react";
 function NoteDashboard() {
   const { user, logout, isLoading } = useAuth0();
   const [isFirstTime, setIsFirstTime] = useState(false);
@@ -182,7 +182,6 @@ function NoteDashboard() {
           />
         ) : (
           <>
-            {/* Search */}
             <div className="mb-4 sm:mb-6">
               <div className="relative max-w-full sm:max-w-md">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -195,7 +194,6 @@ function NoteDashboard() {
               </div>
             </div>
 
-            {/* Notes Grid */}
             {filteredNotes.length === 0 ? (
               <div className="text-center py-8 sm:py-12">
                 <Search className="h-12 w-12 sm:h-16 sm:w-16 mx-auto mb-4 text-muted-foreground" />
