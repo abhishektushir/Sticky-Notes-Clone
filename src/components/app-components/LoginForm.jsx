@@ -1,7 +1,7 @@
 import React from "react";
 import chrome from "@/assests/chrome.svg";
 import github from "@/assests/github.svg";
-import { LogIn} from "lucide-react";
+import { LogIn } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "../ui/card.jsx";
 import { Button } from "../ui/button.jsx";
-import { useAuth0 } from "./MockAuthProvider.jsx";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const LoginForm = () => {
   const { loginWithRedirect, isLoading } = useAuth0();
@@ -41,7 +41,7 @@ const LoginForm = () => {
               disabled={isLoading}
               className="w-full h-11 text-base">
               <LogIn className="h-4 w-4 mr-2" />
-              {isLoading ? "Signing in..." : "Sign In with Demo Account"}
+              {isLoading ? "Signing in..." : "Sign In "}
             </Button>
 
             <div className="relative">
@@ -62,7 +62,7 @@ const LoginForm = () => {
                 disabled={isLoading}
                 className="w-full h-11 text-base">
                 <img src={chrome} alt="google" className="h-4 w-4 mr-2" />
-                Continue with Google (Demo)
+                Continue with Google 
               </Button>
 
               <Button
@@ -71,16 +71,11 @@ const LoginForm = () => {
                 disabled={isLoading}
                 className="w-full h-11 text-base">
                 <img src={github} alt="github" className="h-4 w-4 mr-2" />
-                Continue with GitHub (Demo)
+                Continue with GitHub 
               </Button>
             </div>
 
-            <div className="text-center text-xs text-muted-foreground mt-6">
-              <p>
-                <strong>Demo Mode:</strong> This is a demo version using mock
-                authentication. Your notes are stored locally in your browser.
-              </p>
-            </div>
+            /
           </CardContent>
         </Card>
       </div>
