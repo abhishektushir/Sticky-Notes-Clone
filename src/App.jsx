@@ -1,21 +1,16 @@
 import "./App.css";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import AppLayout from "./layouts/AppLayout";
-import Home from "./pages/Home";
+import AuthGuard from "./components/app-components/AuthGuard";
+import LoginForm from "./components/app-components/LoginForm";
+import { MockAuth0Provider } from "./components/app-components/MockAuthProvider";
+
 function App() {
-  const router = createBrowserRouter([
-    {
-      errorElement:'error',
-      element: <AppLayout />,
-      children: [
-        {
-          path: "/",
-          element: <Home />,
-        },
-      ],
-    },
-  ]);
-  return <RouterProvider router={router}/>
+  return (
+    <MockAuth0Provider>
+      <AuthGuard>
+        <LoginForm />
+      </AuthGuard>
+    </MockAuth0Provider>
+  );
 }
 
 export default App;
