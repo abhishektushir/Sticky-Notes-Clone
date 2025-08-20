@@ -7,16 +7,19 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { LogOut, Menu } from "lucide-react";
-import React, { useState } from "react";
+import { LogOut, Menu, Search } from "lucide-react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useAuth0 } from "@/components/app-components/MockAuthProvider";
 import CreateNoteDialog from "@/components/app-components/CreateNoteDialog";
 import FirstInteraction from "@/components/app-components/FirstInteraction";
+import NoteCard from "@/components/app-components/NoteCard";
+import { Input } from "@/components/ui/input";
 function NoteDashboard() {
   const { user, logout, isLoading } = useAuth0();
   const [isFirstTime, setIsFirstTime] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [notes, setNotes] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const handleLogout = () => {
     logout({
       logoutParams: {
@@ -38,6 +41,50 @@ function NoteDashboard() {
     setNotes((prev) => [newNote, ...prev]);
     setIsFirstTime(false);
   };
+  const updateNote = (id, content) => {
+    setNotes((prev) =>
+      prev.map((note) =>
+        note.id === id ? { ...note, content, updatedAt: Date.now() } : note
+      )
+    );
+  };
+
+  const deleteNote = (id) => {
+    setNotes((prev) => prev.filter((note) => note.id !== id));
+  };
+
+  const filteredNotes = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return notes;
+    }
+
+    return notes.filter((note) =>
+      note.content.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [notes, searchQuery]);
+  useEffect(() => {
+    if (user?.sub) {
+      const userNotesKey = `notes_${user.sub}`;
+      const savedNotes = localStorage.getItem(userNotesKey);
+
+      if (savedNotes) {
+        const parsedNotes = JSON.parse(savedNotes);
+        setNotes(parsedNotes);
+        setIsFirstTime(parsedNotes.length === 0);
+      } else {
+        setNotes([]);
+        setIsFirstTime(true);
+      }
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (user?.sub) {
+      const userNotesKey = `notes_${user.sub}`;
+      localStorage.setItem(userNotesKey, JSON.stringify(notes));
+    }
+  }, [notes, user]);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b sticky top-0 z-50">
@@ -128,7 +175,55 @@ function NoteDashboard() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-        <FirstInteraction onCreateNote={createNote} isFirstTime={isFirstTime} />
+        {notes.length === 0 ? (
+          <FirstInteraction
+            onCreateNote={createNote}
+            isFirstTime={isFirstTime}
+          />
+        ) : (
+          <>
+            {/* Search */}
+            <div className="mb-4 sm:mb-6">
+              <div className="relative max-w-full sm:max-w-md">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                <Input
+                  placeholder="Search notes..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+
+            {/* Notes Grid */}
+            {filteredNotes.length === 0 ? (
+              <div className="text-center py-8 sm:py-12">
+                <Search className="h-12 w-12 sm:h-16 sm:w-16 mx-auto mb-4 text-muted-foreground" />
+                <h3 className="mb-2">No notes found</h3>
+                <p className="text-muted-foreground px-4">
+                  Try adjusting your search query or create a new note.
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className="mb-4 text-sm text-muted-foreground">
+                  {filteredNotes.length}{" "}
+                  {filteredNotes.length === 1 ? "note" : "notes"} found
+                </div>
+                <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {filteredNotes.map((note) => (
+                    <NoteCard
+                      key={note.id}
+                      note={note}
+                      onUpdate={updateNote}
+                      onDelete={deleteNote}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </>
+        )}
       </main>
     </div>
   );
