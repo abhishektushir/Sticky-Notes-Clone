@@ -10,16 +10,33 @@ import {
 import { LogOut, Menu } from "lucide-react";
 import React, { useState } from "react";
 import { useAuth0 } from "@/components/app-components/MockAuthProvider";
+import CreateNoteDialog from "@/components/app-components/CreateNoteDialog";
+import FirstInteraction from "@/components/app-components/FirstInteraction";
 function NoteDashboard() {
   const { user, logout, isLoading } = useAuth0();
   const [isFirstTime, setIsFirstTime] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [notes, setNotes] = useState([]);
   const handleLogout = () => {
     logout({
       logoutParams: {
         returnTo: window.location.origin,
       },
     });
+  };
+  const createNote = (content) => {
+    if (!user?.sub) return;
+
+    const newNote = {
+      id: Date.now().toString(),
+      content,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      userId: user.sub,
+    };
+
+    setNotes((prev) => [newNote, ...prev]);
+    setIsFirstTime(false);
   };
   return (
     <div className="min-h-screen bg-gray-50">
@@ -29,7 +46,9 @@ function NoteDashboard() {
             <div className="flex items-center space-x-3 sm:space-x-4">
               <h1 className="text-lg sm:text-xl">NoteKeeper</h1>
 
-              <div className="hidden sm:block"></div>
+              <div className="hidden sm:block">
+                <CreateNoteDialog onCreateNote={createNote} />
+              </div>
             </div>
 
             {/* Desktop user info and logout */}
@@ -57,7 +76,7 @@ function NoteDashboard() {
 
             {/* Mobile menu */}
             <div className="flex sm:hidden items-center space-x-2">
-            
+              <CreateNoteDialog onCreateNote={createNote} />
               <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                 <SheetTrigger asChild>
                   <Button variant="outline" size="sm">
@@ -108,7 +127,9 @@ function NoteDashboard() {
         </div>
       </header>
 
-      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+        <FirstInteraction onCreateNote={createNote} isFirstTime={isFirstTime} />
+      </main>
     </div>
   );
 }
