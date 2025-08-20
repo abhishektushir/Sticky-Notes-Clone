@@ -4,7 +4,8 @@ import LoginForm from "./LoginForm.jsx";
 import { useAuth0 } from "./MockAuthProvider.jsx";
 
 const AuthGuard = ({ children }) => {
-  const { isLoading, isAuthenticated } = useAuth0();
+    const { isLoading, isAuthenticated } = useAuth0();
+    
 
   if (isLoading) {
     return (
